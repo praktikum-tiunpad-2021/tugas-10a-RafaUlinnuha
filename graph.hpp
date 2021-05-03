@@ -49,7 +49,7 @@ class graph {
   }
 
   void remove_vertex(const VertexType &val) {
-    // TODO: Implementasikan!
+    _adj_list.erase(val);
   }
 
   /**
@@ -59,7 +59,8 @@ class graph {
    * @param val2 nilai vertex 2
    */
   void add_edge(const VertexType &val1, const VertexType val2) {
-    // TODO: Implementasikan!
+    _adj_list[val1].insert(val2);
+    _adj_list[val2].insert(val1);
   }
 
   /**
@@ -68,7 +69,7 @@ class graph {
    * @param val nilai dari vertex yang akan dihapus
    */
   void remove_edge(const VertexType &val1, const VertexType &val2) {
-    // TODO: Implementasikan!
+    if()
   }
 
   /**
