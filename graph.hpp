@@ -3,6 +3,8 @@
 #include <functional>
 #include <unordered_map>
 #include <unordered_set>
+#include <stack>
+#include <vector>
 
 namespace strukdat {
 
@@ -101,8 +103,13 @@ class graph {
    * @return vertex-vertex saling bertetangga
    */
   bool is_edge(const VertexType &val1, const VertexType &val2) const {
-    // TODO: Implementasikan!
+    if(_adj_list.at(val1).find(val2) != _adj_list.at(val1).end()){
+      return true;
+    } else if(_adj_list.at(val2).find(val1) != _adj_list.at(val2).end()){
+      return true;
+    } return false;
   }
+
 
   /**
    * @brief Melakukan BFS traversal pada graph
@@ -112,7 +119,24 @@ class graph {
    */
   void bfs(const VertexType &root,
            std::function<void(const VertexType &)> func) const {
-    // TODO: Implementasikan!
+    std::unordered_map<VertexType,bool> visited;
+    std::vector<VertexType> q;
+    for (auto it = _adj_list.begin(); it!= _adj_list.end(); it++){
+      visited.insert(std::make_pair(it->first,false));
+    }
+    q.push_back(root);
+    visited[root] = true;
+    while(not(q.empty())){
+      VertexType curr = q.front();
+      q.erase(q.begin());
+      func(curr);
+      for(auto it= _adj_list.at(curr).begin(); it!= _adj_list.at(curr).end();it++){
+        if(not(visited[*it])){
+          visited[*it] = true;
+          q.push_back(*it);
+        }
+      }
+    }
   }
 
   /**
@@ -123,7 +147,27 @@ class graph {
    */
   void dfs(const VertexType &root,
            std::function<void(const VertexType &)> func) const {
-    // TODO: Implementasikan!
+    std::unordered_map<VertexType,bool> visited;
+    std::stack<VertexType> stack;
+    for(auto it = _adj_list.begin(); it != _adj_list.end(); it++){
+      visited.insert(std::make_pair(it->first, false));
+    }
+    stack.push(root);
+    while (!stack.empty()){
+      VertexType curr = stack.top();
+      stack.pop();
+
+      if (!visited[curr]) {
+        func(curr);
+        visited[curr] = true;
+      }
+      
+      for (auto it = _adj_list.at(curr).begin(); it != _adj_list.at(curr).end(); it++){
+        if (!visited[*it]){
+          stack.push(*it); 
+        }
+      }
+    }
   }
 
  private:
