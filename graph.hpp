@@ -59,7 +59,7 @@ class graph {
    * @param val2 nilai vertex 2
    */
   void add_edge(const VertexType &val1, const VertexType val2) {
-    if(_adj_list.find(val1) == _adj_list.end() && _adj_list.find(val2) == _adj_list.end(){
+    if(_adj_list.find(val1) == _adj_list.end() && _adj_list.find(val2) == _adj_list.end()){
       _adj_list[val1].insert(val2);
       _adj_list[val2].insert(val1);
     }
@@ -135,4 +135,4 @@ class graph {
   adj_list_type _adj_list;
 };
 
-}  // namespace strukdat
+};  // namespace strukdat
