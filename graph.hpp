@@ -59,8 +59,10 @@ class graph {
    * @param val2 nilai vertex 2
    */
   void add_edge(const VertexType &val1, const VertexType val2) {
-    _adj_list[val1].insert(val2);
-    _adj_list[val2].insert(val1);
+    if(_adj_list.find(val1) == _adj_list.end() && _adj_list.find(val2) == _adj_list.end(){
+      _adj_list[val1].insert(val2);
+      _adj_list[val2].insert(val1);
+    }
   }
 
   /**
@@ -69,7 +71,13 @@ class graph {
    * @param val nilai dari vertex yang akan dihapus
    */
   void remove_edge(const VertexType &val1, const VertexType &val2) {
-    if()
+    if(_adj_list.find(val1) == _adj_list.end()){
+      return;
+    } if (_adj_list[val1].find(val2) == _adj_list[val1].end()){
+      return;
+    }
+    _adj_list[val1].erase(val2);
+    _adj_list[val2].erase(val1);
   }
 
   /**
@@ -81,7 +89,7 @@ class graph {
    * @return jumlah node pada graph
    */
   size_t order() const {
-    // TODO: Implementasikan!
+    return _adj_list.size();
   }
 
   /**
