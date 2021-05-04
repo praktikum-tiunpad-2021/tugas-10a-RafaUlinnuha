@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <stack>
 #include <vector>
+#include <queue>
 
 namespace strukdat {
 
@@ -61,9 +62,18 @@ class graph {
    * @param val2 nilai vertex 2
    */
   void add_edge(const VertexType &val1, const VertexType val2) {
-    if(_adj_list.find(val1) == _adj_list.end() && _adj_list.find(val2) == _adj_list.end()){
-      _adj_list[val1].insert(val2);
-      _adj_list[val2].insert(val1);
+    list_type &adj1 = _adj_list.at(val1),
+              &adj2 = _adj_list.at(val2);
+    
+    auto it = adj1.find(val2);
+         it = adj2.find(val1);
+
+    if(it == adj1.end()){
+      adj1.insert(val2);
+    }
+   
+    if(it == adj2.end()){
+      adj2.insert(val1);
     }
   }
 
@@ -73,13 +83,19 @@ class graph {
    * @param val nilai dari vertex yang akan dihapus
    */
   void remove_edge(const VertexType &val1, const VertexType &val2) {
-    if(_adj_list.find(val1) == _adj_list.end()){
-      return;
-    } if (_adj_list[val1].find(val2) == _adj_list[val1].end()){
-      return;
+    list_type &adj1 = _adj_list.at(val1), 
+              &adj2 = _adj_list.at(val2);
+    
+    auto it = adj1.find(val2);
+         it = adj2.find(val1);
+         
+    if(it != adj1.end()){
+      adj1.erase(it);
     }
-    _adj_list[val1].erase(val2);
-    _adj_list[val2].erase(val1);
+
+    if(it != adj2.end()){
+      adj2.erase(it);
+    }
   }
 
   /**
@@ -103,15 +119,13 @@ class graph {
    * @return vertex-vertex saling bertetangga
    */
   bool is_edge(const VertexType &val1, const VertexType &val2) const {
-    if(_adj_list.at(val1).find(val2) == _adj_list.at(val1).end()){ 
-      return false; 
-    }
-    if(_adj_list.at(val2).find(val1) == _adj_list.at(val2).end()){ 
-      return false; 
+    if(_adj_list.at(val1).find(val2) == _adj_list.at(val1).end()) {
+      return false;
+    } else if(_adj_list.at(val2).find(val1) == _adj_list.at(val2).end()) {
+      return false;
     }
     return true;
   }
-
 
   /**
    * @brief Melakukan BFS traversal pada graph
@@ -121,21 +135,21 @@ class graph {
    */
   void bfs(const VertexType &root,
            std::function<void(const VertexType &)> func) const {
-    std::unordered_map<VertexType,bool> visited;
-    std::vector<VertexType> q;
-    for (auto it = _adj_list.begin(); it!= _adj_list.end(); it++){
-      visited.insert(std::make_pair(it->first,false));
-    }
-    q.push_back(root);
-    visited[root] = true;
-    while(not(q.empty())){
-      VertexType curr = q.front();
-      q.erase(q.begin());
+    std::vector<bool> visited(_adj_list.size(), false);
+    std::queue<VertexType> q;
+    VertexType curr = root;
+    q.push(curr);
+    visited[curr] = true;
+
+    while(!q.empty()){
+      curr = q.front();
+      q.pop();
       func(curr);
-      for(auto it= _adj_list.at(curr).begin(); it!= _adj_list.at(curr).end();it++){
-        if(not(visited[*it])){
-          visited[*it] = true;
-          q.push_back(*it);
+
+      for(auto it : _adj_list.at(curr)){
+        if(!visited[it]){
+          visited[it] = true;
+          q.push(it);
         }
       }
     }
@@ -149,24 +163,21 @@ class graph {
    */
   void dfs(const VertexType &root,
            std::function<void(const VertexType &)> func) const {
-    std::unordered_map<VertexType,bool> visited;
+    std::vector<bool> visited(_adj_list.size(), false);
     std::stack<VertexType> stack;
-    for(auto it = _adj_list.begin(); it != _adj_list.end(); it++){
-      visited.insert(std::make_pair(it->first, false));
-    }
     stack.push(root);
-    while (!stack.empty()){
+    while(!stack.empty()){
       VertexType curr = stack.top();
       stack.pop();
 
-      if (!visited[curr]) {
+      if(!visited[curr]){
         func(curr);
         visited[curr] = true;
       }
-      
-      for (auto it = _adj_list.at(curr).begin(); it != _adj_list.at(curr).end(); it++){
-        if (!visited[*it]){
-          stack.push(*it); 
+
+      for(auto it : _adj_list.at(curr)){
+        if(!visited[it]){
+          stack.push(it);
         }
       }
     }
@@ -181,4 +192,4 @@ class graph {
   adj_list_type _adj_list;
 };
 
-};  // namespace strukdat
+}  // namespace strukdat
